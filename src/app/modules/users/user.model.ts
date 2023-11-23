@@ -1,31 +1,39 @@
 import { Schema, model } from 'mongoose';
+import bcrypt from 'bcrypt';
 import { IUser, UserAddress, UserFullName, UserModel } from './user.interface';
+import config from '../../config';
 
-const userNameSchema = new Schema<UserFullName>({
-  firstName: {
-    type: String,
-    required: true,
+const userNameSchema = new Schema<UserFullName>(
+  {
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
+      type: String,
+      required: true,
+    },
   },
-  lastName: {
-    type: String,
-    required: true,
-  },
-});
+  { _id: false },
+);
 
-const userAddressSchema = new Schema<UserAddress>({
-  street: {
-    type: String,
-    required: [true, 'Street is required'],
+const userAddressSchema = new Schema<UserAddress>(
+  {
+    street: {
+      type: String,
+      required: [true, 'Street is required'],
+    },
+    city: {
+      type: String,
+      required: [true, 'City is required'],
+    },
+    country: {
+      type: String,
+      required: [true, 'Country is required'],
+    },
   },
-  city: {
-    type: String,
-    required: [true, 'City is required'],
-  },
-  country: {
-    type: String,
-    required: [true, 'Country is required'],
-  },
-});
+  { _id: false },
+);
 
 const userSchema = new Schema<IUser>({
   userId: {
@@ -66,6 +74,23 @@ const userSchema = new Schema<IUser>({
     type: userAddressSchema,
     required: true,
   },
+});
+
+// pre save middleware
+userSchema.pre('save', async function (next) {
+  const user = this;
+
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_rounds),
+  );
+  next();
+});
+
+// post save middleware / hook
+userSchema.post('save', function (doc, next) {
+  doc.password = '';
+  next();
 });
 
 //  creating a custom static method
