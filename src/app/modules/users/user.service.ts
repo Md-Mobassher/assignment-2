@@ -25,7 +25,14 @@ const getAllUserFromDb = async () => {
   return users;
 };
 
+const getSingleUserFromDb = async (id: number) => {
+  console.log(id);
+  const user = await User.aggregate([{ $match: { id } }]);
+  return user;
+};
+
 export const userService = {
   createUserIntoDb,
   getAllUserFromDb,
+  getSingleUserFromDb,
 };
