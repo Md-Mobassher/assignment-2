@@ -45,23 +45,21 @@ const getSingleUserFromDb = async (id: number) => {
   return user;
 };
 
-const updateAUserFromDB = async (userData: IUser) => {
-  const result = await User.updateOne(
-    { userData },
-    {
-      $project: {
-        userId: '$userId',
-        userName: '$userName',
-        fullName: '$fullName',
-        age: '$age',
-        email: '$email',
-        isActive: '$isActive',
-        hobbies: '$hobbies',
-        address: '$address',
-        _id: 0,
-      },
+const updateAUserFromDB = async (userId: number, userData: IUser) => {
+  const result = await User.findOneAndUpdate({ userId: userId }, userData, {
+    new: true,
+    projection: {
+      userId: 1,
+      userName: 1,
+      fullName: 1,
+      age: 1,
+      email: 1,
+      isActive: 1,
+      hobbies: 1,
+      address: 1,
+      _id: 0,
     },
-  );
+  });
   return result;
 };
 

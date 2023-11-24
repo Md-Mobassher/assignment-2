@@ -84,7 +84,7 @@ const updateAUser = async (req: Request, res: Response) => {
     }
 
     const userData = req.body;
-    const result = await userService.updateAUserFromDB(userData);
+    const result = await userService.updateAUserFromDB(userId, userData);
 
     res.status(200).json({
       success: true,
