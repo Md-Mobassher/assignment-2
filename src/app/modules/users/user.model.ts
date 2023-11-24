@@ -74,6 +74,10 @@ const userSchema = new Schema<IUser>({
     type: userAddressSchema,
     required: true,
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // pre save middleware
@@ -94,8 +98,8 @@ userSchema.post('save', function (doc, next) {
 });
 
 //  creating a custom static method
-userSchema.statics.isUserExists = async function (id: number) {
-  const existingUser = await User.findOne({ id });
+userSchema.statics.isUserExists = async function (userId: number) {
+  const existingUser = await User.findOne({ userId });
   return existingUser;
 };
 

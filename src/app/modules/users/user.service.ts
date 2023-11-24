@@ -38,14 +38,42 @@ const getSingleUserFromDb = async (id: number) => {
         isActive: '$isActive',
         hobbies: '$hobbies',
         address: '$address',
+        _id: 0,
       },
     },
   ]);
   return user;
 };
 
+const updateAUserFromDB = async (userData: IUser) => {
+  const result = await User.updateOne(
+    { userData },
+    {
+      $project: {
+        userId: '$userId',
+        userName: '$userName',
+        fullName: '$fullName',
+        age: '$age',
+        email: '$email',
+        isActive: '$isActive',
+        hobbies: '$hobbies',
+        address: '$address',
+        _id: 0,
+      },
+    },
+  );
+  return result;
+};
+
+const deleteAUserFromDB = async (id: number) => {
+  const result = await User.updateOne({ id }, { isDeleted: true });
+  return result;
+};
+
 export const userService = {
   createUserIntoDb,
   getAllUserFromDb,
   getSingleUserFromDb,
+  updateAUserFromDB,
+  deleteAUserFromDB,
 };

@@ -23,8 +23,10 @@ export interface IUser {
   hobbies: string[];
   address: UserAddress;
   orders?: IOrder[];
+  isDeleted: boolean;
 }
 
+// static method
 export interface UserModel extends Model<IUser> {
   isUserExists(id: number): Promise<IUser | null>;
 }
