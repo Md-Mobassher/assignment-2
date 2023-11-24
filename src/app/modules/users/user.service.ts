@@ -26,8 +26,21 @@ const getAllUserFromDb = async () => {
 };
 
 const getSingleUserFromDb = async (id: number) => {
-  console.log(id);
-  const user = await User.aggregate([{ $match: { id } }]);
+  const user = await User.aggregate([
+    { $match: { userId: id } },
+    {
+      $project: {
+        userId: '$userId',
+        userName: '$userName',
+        fullName: '$fullName',
+        age: '$age',
+        email: '$email',
+        isActive: '$isActive',
+        hobbies: '$hobbies',
+        address: '$address',
+      },
+    },
+  ]);
   return user;
 };
 
