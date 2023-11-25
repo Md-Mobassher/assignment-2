@@ -1,5 +1,4 @@
 import { Model } from 'mongoose';
-import { IOrder } from '../orders/order.interface';
 
 export interface UserFullName {
   firstName: string;
@@ -12,6 +11,12 @@ export interface UserAddress {
   country: string;
 }
 
+export interface Product {
+  productName: string;
+  price: number;
+  quantity: number;
+}
+
 export interface IUser {
   userId: number;
   userName: string;
@@ -22,8 +27,8 @@ export interface IUser {
   isActive: boolean;
   hobbies: string[];
   address: UserAddress;
-  orders?: IOrder[];
   isDeleted: boolean;
+  orders?: Product[];
 }
 
 // static method

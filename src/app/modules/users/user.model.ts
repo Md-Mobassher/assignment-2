@@ -1,7 +1,15 @@
 import { Schema, model } from 'mongoose';
 import bcrypt from 'bcrypt';
-import { IUser, UserAddress, UserFullName, UserModel } from './user.interface';
+import {
+  IOrder,
+  IUser,
+  Product,
+  UserAddress,
+  UserFullName,
+  UserModel,
+} from './user.interface';
 import config from '../../config';
+import { optional } from 'zod';
 
 const userNameSchema = new Schema<UserFullName>(
   {
@@ -34,6 +42,21 @@ const userAddressSchema = new Schema<UserAddress>(
   },
   { _id: false },
 );
+
+const productSchema = new Schema<Product>({
+  productName: {
+    type: String,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+  },
+});
 
 const userSchema = new Schema<IUser>({
   userId: {
@@ -72,11 +95,16 @@ const userSchema = new Schema<IUser>({
   },
   address: {
     type: userAddressSchema,
-    required: true,
+    required: [true, 'Address is required'],
   },
   isDeleted: {
     type: Boolean,
     default: false,
+  },
+  orders: {
+    type: [productSchema],
+    required: false,
+    default: [],
   },
 });
 
