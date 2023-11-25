@@ -31,10 +31,11 @@ export interface IUser {
   isActive: boolean;
   hobbies: string[];
   address: UserAddress;
-  isDeleted?: boolean;
-  orders?: IOrder;
+  isDeleted?: boolean | undefined;
+  orders?: IOrder | [];
 
   getAllOrders(): Promise<IOrder | null>;
+  calculateTotalPrice(): Promise<IOrder | null>;
 }
 
 // static method

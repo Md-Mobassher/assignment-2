@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose';
 import bcrypt from 'bcrypt';
 import {
+  IOrder,
   IUser,
   Product,
   UserAddress,
@@ -129,7 +130,7 @@ userSchema.pre('aggregate', function (next) {
   next();
 });
 
-//  creating a custom static method
+//  creating a custom static method to check user exist or not
 userSchema.statics.isUserExists = async function (userId: number) {
   const existingUser = await User.findOne({ userId });
   return existingUser;
@@ -154,6 +155,22 @@ userSchema.statics.addOrderToUser = async function (userId, orderdata) {
 // Instance method to get all orders for a user
 userSchema.methods.getAllOrders = async function () {
   return this.orders;
+};
+
+// calculate total price
+userSchema.methods.calculateTotalPrice = async function () {
+  const orders = this.orders || [];
+
+  const totalPrice = orders.reduce((acc: number, order: IOrder) => {
+    const orderTotal = order.products.reduce(
+      (productTotal, product) =>
+        productTotal + product.price * product.quantity,
+      0,
+    );
+    return acc + orderTotal;
+  }, 0);
+
+  return totalPrice;
 };
 
 export const User = model<IUser, UserModel>('User', userSchema);

@@ -20,9 +20,12 @@ const productValidationSchema = z.object({
     .positive({ message: 'Quantity must be a positive integer' }),
 });
 
-const orderValidationSchema = z.array(productValidationSchema).default([]);
+const orderValidationSchema = z
+  .array(productValidationSchema)
+  .optional()
+  .default([]);
 
-export const userValidationSchema = z.object({
+const userValidationSchema = z.object({
   userId: z
     .number()
     .int()
@@ -35,8 +38,8 @@ export const userValidationSchema = z.object({
   isActive: z.boolean(),
   hobbies: z.array(z.string().min(1, { message: 'Hobby cannot be empty' })),
   address: userAddressValidationSchema.required(),
-  isDeleted: z.boolean().optional().default(false),
-  orders: orderValidationSchema,
+  isDeleted: z.boolean().optional(),
+  orders: orderValidationSchema.optional(),
 });
 
 export default userValidationSchema;

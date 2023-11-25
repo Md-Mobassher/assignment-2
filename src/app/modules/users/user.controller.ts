@@ -1,12 +1,11 @@
 import { Request, Response } from 'express';
 import { userService } from './user.service';
-import { User } from './user.model';
 import userValidationSchema from './user.validation';
 
+// create a user
 const createUser = async (req: Request, res: Response) => {
   try {
     const userData = req.body;
-
     const zodParseData = await userValidationSchema.parse(userData);
 
     const result = await userService.createUserIntoDb(zodParseData);
@@ -25,6 +24,7 @@ const createUser = async (req: Request, res: Response) => {
   }
 };
 
+// get all user
 const getAllUser = async (req: Request, res: Response) => {
   try {
     const result = await userService.getAllUserFromDb();
@@ -43,21 +43,20 @@ const getAllUser = async (req: Request, res: Response) => {
   }
 };
 
+// get a single user by id
 const getSingleUser = async (req: Request, res: Response) => {
   try {
     const id = req.params.userId;
     const userId = Number(id);
+    const result = await userService.getSingleUserFromDb(userId);
 
-    const existingUser = await User.isUserExists(userId);
-    if (!existingUser) {
+    if (!result) {
       return res.status(404).json({
         success: false,
         message: 'User not found',
         error: { code: 404, description: 'User not found!' },
       });
     }
-
-    const result = await userService.getSingleUserFromDb(userId);
 
     return res.status(200).json({
       success: true,
@@ -73,21 +72,21 @@ const getSingleUser = async (req: Request, res: Response) => {
   }
 };
 
+// update a user
 const updateAUser = async (req: Request, res: Response) => {
   try {
     const id = req.params.userId;
     const userId = Number(id);
-    const existingUser = await User.isUserExists(userId);
-    if (!existingUser) {
+    const userData = req.body;
+    const result = await userService.updateAUserFromDB(userId, userData);
+
+    if (!result) {
       return res.status(404).json({
         success: false,
         message: 'User not found',
         error: { code: 404, description: 'User not found!' },
       });
     }
-
-    const userData = req.body;
-    const result = await userService.updateAUserFromDB(userId, userData);
 
     res.status(200).json({
       success: true,
@@ -103,20 +102,20 @@ const updateAUser = async (req: Request, res: Response) => {
   }
 };
 
+// delete a user
 const deleteAUser = async (req: Request, res: Response) => {
   try {
     const id = req.params.userId;
     const userId = Number(id);
-    const existingUser = await User.isUserExists(userId);
-    if (!existingUser) {
+    const result = await userService.deleteAUserFromDB(userId);
+
+    if (!result) {
       return res.status(404).json({
         success: false,
         message: 'User not found',
         error: { code: 404, description: 'User not found!' },
       });
     }
-
-    const result = await userService.deleteAUserFromDB(userId);
 
     res.status(200).json({
       success: true,
@@ -132,22 +131,21 @@ const deleteAUser = async (req: Request, res: Response) => {
   }
 };
 
-// order controller
+// update order
 const updateAnOrder = async (req: Request, res: Response) => {
   try {
     const id = req.params.userId;
     const userId = Number(id);
-    const existingUser = await User.isUserExists(userId);
-    if (!existingUser) {
+    const orderData = req.body;
+    const result = await userService.updateOrderFromDB(userId, orderData);
+
+    if (!result) {
       return res.status(404).json({
         success: false,
         message: 'User not found',
         error: { code: 404, description: 'User not found!' },
       });
     }
-
-    const orderData = req.body;
-    const result = await userService.updateOrderFromDB(userId, orderData);
 
     res.status(200).json({
       success: true,
@@ -192,6 +190,35 @@ const getAllOrder = async (req: Request, res: Response) => {
   }
 };
 
+// calculate total price
+const calculateTotalPrice = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.userId;
+    const userId = Number(id);
+    const result = await userService.calculateTotalPriceFromDb(userId);
+
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: { code: 404, description: 'User not found!' },
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Order fetched successfully!',
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Something went wrong',
+      error: error,
+    });
+  }
+};
+
 export const userController = {
   createUser,
   getAllUser,
@@ -200,4 +227,5 @@ export const userController = {
   deleteAUser,
   updateAnOrder,
   getAllOrder,
+  calculateTotalPrice,
 };

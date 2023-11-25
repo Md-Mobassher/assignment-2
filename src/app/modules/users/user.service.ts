@@ -5,8 +5,19 @@ const createUserIntoDb = async (userData: IUser) => {
   if (await User.isUserExists(userData.userId)) {
     throw new Error('User already exist');
   }
-  const result = await User.create(userData);
-  return result;
+  const createdUser = await User.create(userData);
+  const responseData = {
+    userId: createdUser.userId,
+    username: createdUser.username,
+    fullName: createdUser.fullName,
+    age: createdUser.age,
+    email: createdUser.email,
+    isActive: createdUser.isActive,
+    hobbies: createdUser.hobbies,
+    address: createdUser.address,
+  };
+
+  return responseData;
 };
 
 const getAllUserFromDb = async () => {
@@ -25,9 +36,14 @@ const getAllUserFromDb = async () => {
   return users;
 };
 
-const getSingleUserFromDb = async (id: number) => {
+const getSingleUserFromDb = async (userId: number) => {
+  const existingUser = await User.isUserExists(userId);
+  if (!existingUser) {
+    return null;
+  }
+
   const user = await User.aggregate([
-    { $match: { userId: id } },
+    { $match: { userId: userId } },
     {
       $project: {
         userId: '$userId',
@@ -46,6 +62,11 @@ const getSingleUserFromDb = async (id: number) => {
 };
 
 const updateAUserFromDB = async (userId: number, userData: IUser) => {
+  const existingUser = await User.isUserExists(userId);
+  if (!existingUser) {
+    return null;
+  }
+
   const result = await User.findOneAndUpdate({ userId: userId }, userData, {
     new: true,
     projection: {
@@ -63,13 +84,24 @@ const updateAUserFromDB = async (userId: number, userData: IUser) => {
   return result;
 };
 
-const deleteAUserFromDB = async (id: number) => {
-  const result = await User.updateOne({ id }, { isDeleted: true });
+const deleteAUserFromDB = async (userId: number) => {
+  const existingUser = await User.isUserExists(userId);
+  if (!existingUser) {
+    return null;
+  }
+
+  const result = await User.updateOne({ userId }, { isDeleted: true });
   return result;
 };
 
 // order service funciton
 const updateOrderFromDB = async (userId: number, orderData: IUser) => {
+  const existingUser = await User.isUserExists(userId);
+
+  if (!existingUser) {
+    return null;
+  }
+
   const result = await User.findOneAndUpdate({ userId: userId }, orderData, {
     new: true,
     projection: {
@@ -88,7 +120,7 @@ const updateOrderFromDB = async (userId: number, orderData: IUser) => {
 };
 
 // get all order from db
-export const getAllOrderFromDb = async (userId: number) => {
+const getAllOrderFromDb = async (userId: number) => {
   const existingUser = await User.isUserExists(userId);
 
   if (!existingUser) {
@@ -96,6 +128,16 @@ export const getAllOrderFromDb = async (userId: number) => {
   }
   const orders = await existingUser.getAllOrders();
   return orders;
+};
+
+const calculateTotalPriceFromDb = async (userId: number) => {
+  const existingUser = await User.isUserExists(userId);
+  if (!existingUser) {
+    return null;
+  }
+
+  const totalPrice = await existingUser.calculateTotalPrice();
+  return totalPrice;
 };
 
 export const userService = {
@@ -106,4 +148,5 @@ export const userService = {
   deleteAUserFromDB,
   updateOrderFromDB,
   getAllOrderFromDb,
+  calculateTotalPriceFromDb,
 };
