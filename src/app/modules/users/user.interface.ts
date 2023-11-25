@@ -17,9 +17,13 @@ export interface Product {
   quantity: number;
 }
 
+export interface IOrder {
+  products: Product[];
+}
+
 export interface IUser {
   userId: number;
-  userName: string;
+  username: string;
   password: string;
   fullName: UserFullName;
   age: number;
@@ -27,8 +31,10 @@ export interface IUser {
   isActive: boolean;
   hobbies: string[];
   address: UserAddress;
-  isDeleted: boolean;
-  orders?: Product[];
+  isDeleted?: boolean;
+  orders?: IOrder;
+
+  getAllOrders(): Promise<IOrder | null>;
 }
 
 // static method

@@ -31,7 +31,7 @@ const getSingleUserFromDb = async (id: number) => {
     {
       $project: {
         userId: '$userId',
-        userName: '$userName',
+        username: '$username',
         fullName: '$fullName',
         age: '$age',
         email: '$email',
@@ -50,7 +50,7 @@ const updateAUserFromDB = async (userId: number, userData: IUser) => {
     new: true,
     projection: {
       userId: 1,
-      userName: 1,
+      username: 1,
       fullName: 1,
       age: 1,
       email: 1,
@@ -68,10 +68,42 @@ const deleteAUserFromDB = async (id: number) => {
   return result;
 };
 
+// order service funciton
+const updateOrderFromDB = async (userId: number, orderData: IUser) => {
+  const result = await User.findOneAndUpdate({ userId: userId }, orderData, {
+    new: true,
+    projection: {
+      userId: 1,
+      username: 1,
+      fullName: 1,
+      age: 1,
+      email: 1,
+      isActive: 1,
+      hobbies: 1,
+      address: 1,
+      _id: 0,
+    },
+  });
+  return null;
+};
+
+// get all order from db
+export const getAllOrderFromDb = async (userId: number) => {
+  const existingUser = await User.isUserExists(userId);
+
+  if (!existingUser) {
+    return null;
+  }
+  const orders = await existingUser.getAllOrders();
+  return orders;
+};
+
 export const userService = {
   createUserIntoDb,
   getAllUserFromDb,
   getSingleUserFromDb,
   updateAUserFromDB,
   deleteAUserFromDB,
+  updateOrderFromDB,
+  getAllOrderFromDb,
 };

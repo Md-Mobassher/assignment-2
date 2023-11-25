@@ -1,7 +1,6 @@
 import { Schema, model } from 'mongoose';
 import bcrypt from 'bcrypt';
 import {
-  IOrder,
   IUser,
   Product,
   UserAddress,
@@ -9,7 +8,6 @@ import {
   UserModel,
 } from './user.interface';
 import config from '../../config';
-import { optional } from 'zod';
 
 const userNameSchema = new Schema<UserFullName>(
   {
@@ -64,7 +62,7 @@ const userSchema = new Schema<IUser>({
     required: [true, 'Id is required'],
     unique: true,
   },
-  userName: {
+  username: {
     type: String,
     required: [true, 'Name is required'],
     unique: true,
@@ -99,6 +97,7 @@ const userSchema = new Schema<IUser>({
   },
   isDeleted: {
     type: Boolean,
+    required: false,
     default: false,
   },
   orders: {
@@ -125,10 +124,36 @@ userSchema.post('save', function (doc, next) {
   next();
 });
 
+userSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+  next();
+});
+
 //  creating a custom static method
 userSchema.statics.isUserExists = async function (userId: number) {
   const existingUser = await User.findOne({ userId });
   return existingUser;
+};
+
+userSchema.statics.addOrderToUser = async function (userId, orderdata) {
+  await this.updateOne(
+    { userId: userId },
+    {
+      $addToSet: {
+        orders: {
+          productName: orderdata.productName,
+          price: orderdata.price,
+          quantity: orderdata.quantity,
+        },
+      },
+    },
+    { upsert: true },
+  );
+};
+
+// Instance method to get all orders for a user
+userSchema.methods.getAllOrders = async function () {
+  return this.orders;
 };
 
 export const User = model<IUser, UserModel>('User', userSchema);

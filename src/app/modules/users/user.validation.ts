@@ -27,7 +27,7 @@ export const userValidationSchema = z.object({
     .number()
     .int()
     .positive({ message: 'User ID must be a positive integer' }),
-  userName: z.string().min(1, { message: 'Username is required' }),
+  username: z.string().min(1, { message: 'Username is required' }),
   password: z.string().min(1, { message: 'Password is required' }),
   fullName: userFullNameValidationSchema.required(),
   age: z.number().int().positive({ message: 'Age must be a positive integer' }),
@@ -35,7 +35,7 @@ export const userValidationSchema = z.object({
   isActive: z.boolean(),
   hobbies: z.array(z.string().min(1, { message: 'Hobby cannot be empty' })),
   address: userAddressValidationSchema.required(),
-  isDeleted: z.boolean().default(false),
+  isDeleted: z.boolean().optional().default(false),
   orders: orderValidationSchema,
 });
 
