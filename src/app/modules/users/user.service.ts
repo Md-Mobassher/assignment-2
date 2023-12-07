@@ -95,28 +95,17 @@ const deleteAUserFromDB = async (userId: number) => {
 };
 
 // order service funciton
-const updateOrderFromDB = async (userId: number, orderData: IUser) => {
+const updateOrderFromDB = async (userId: number, orderData: Partial<IUser>) => {
   const existingUser = await User.isUserExists(userId);
 
-  if (!existingUser) {
-    return null;
+  if (existingUser) {
+    const result = await User.findOneAndUpdate(
+      { userId: userId },
+      { $push: { orders: orderData } },
+      { new: true },
+    );
+    return result;
   }
-
-  const result = await User.findOneAndUpdate({ userId: userId }, orderData, {
-    new: true,
-    projection: {
-      userId: 1,
-      username: 1,
-      fullName: 1,
-      age: 1,
-      email: 1,
-      isActive: 1,
-      hobbies: 1,
-      address: 1,
-      _id: 0,
-    },
-  });
-  return null;
 };
 
 // get all order from db
@@ -132,7 +121,7 @@ const getAllOrderFromDb = async (userId: number) => {
 
 const calculateTotalPriceFromDb = async (userId: number) => {
   const existingUser = await User.isUserExists(userId);
-  if (!existingUser) {
+  if (existingUser) {
     return null;
   }
 
