@@ -115,17 +115,18 @@ const getAllOrderFromDb = async (userId: number) => {
   if (!existingUser) {
     return null;
   }
-  const orders = await existingUser.getAllOrders();
+  const orders = await User.getAllOrders(userId);
   return orders;
 };
 
 const calculateTotalPriceFromDb = async (userId: number) => {
   const existingUser = await User.isUserExists(userId);
-  if (existingUser) {
+
+  if (!existingUser) {
     return null;
   }
 
-  const totalPrice = await existingUser.calculateTotalPrice();
+  const totalPrice = await User.calculateTotalPrice(userId);
   return totalPrice;
 };
 

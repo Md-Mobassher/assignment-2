@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Model } from 'mongoose';
 
 export interface UserFullName {
@@ -11,14 +12,10 @@ export interface UserAddress {
   country: string;
 }
 
-export interface Product {
+export interface IOrder {
   productName: string;
   price: number;
   quantity: number;
-}
-
-export interface IOrder {
-  products: Product[];
 }
 
 export interface IUser {
@@ -32,10 +29,15 @@ export interface IUser {
   hobbies: string[];
   address: UserAddress;
   isDeleted?: boolean | undefined;
-  orders?: IOrder | [];
+  orders?: IOrder[] | [];
+}
 
-  getAllOrders(): Promise<IOrder | null>;
-  calculateTotalPrice(): Promise<IOrder | null>;
+export interface UserModel extends Model<IUser> {
+  getAllOrders(id: number): Promise<IOrder | null>;
+}
+
+export interface UserModel extends Model<IUser> {
+  calculateTotalPrice(id: number): Promise<IOrder | null>;
 }
 
 // static method

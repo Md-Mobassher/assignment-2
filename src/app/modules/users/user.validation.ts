@@ -11,19 +11,35 @@ const userAddressValidationSchema = z.object({
   country: z.string().min(1, { message: 'Country is required' }),
 });
 
-const productValidationSchema = z.object({
-  productName: z.string().min(1, { message: 'Product name is required' }),
-  price: z.number().positive({ message: 'Price must be a positive number' }),
-  quantity: z
-    .number()
-    .int()
-    .positive({ message: 'Quantity must be a positive integer' }),
-});
-
 const orderValidationSchema = z
-  .array(productValidationSchema)
+  .array(
+    z.object({
+      productName: z.string().min(1, { message: 'Product name is required' }),
+      price: z
+        .number()
+        .positive({ message: 'Price must be a positive number' }),
+      quantity: z
+        .number()
+        .int()
+        .positive({ message: 'Quantity must be a positive integer' }),
+    }),
+  )
   .optional()
   .default([]);
+
+// const productValidationSchema = z.object({
+//   productName: z.string().min(1, { message: 'Product name is required' }),
+//   price: z.number().positive({ message: 'Price must be a positive number' }),
+//   quantity: z
+//     .number()
+//     .int()
+//     .positive({ message: 'Quantity must be a positive integer' }),
+// });
+
+// const orderValidationSchema = z
+//   .array(productValidationSchema)
+//   .optional()
+//   .default([]);
 
 const userValidationSchema = z.object({
   userId: z
@@ -39,7 +55,7 @@ const userValidationSchema = z.object({
   hobbies: z.array(z.string().min(1, { message: 'Hobby cannot be empty' })),
   address: userAddressValidationSchema.required(),
   isDeleted: z.boolean().optional(),
-  orders: orderValidationSchema.optional(),
+  orders: orderValidationSchema,
 });
 
 export default userValidationSchema;
